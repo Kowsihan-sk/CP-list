@@ -1,0 +1,105 @@
+/** Author : S Kowsihan **/
+#include <bits/stdc++.h>
+using namespace std;
+
+#define fast                          \
+    ios_base::sync_with_stdio(false); \
+    cin.tie(NULL);                    \
+    cout.tie(NULL);
+#define ll long long
+#define endl "\n"
+#define f(a, b, c) for (ll i = a; i < b; i += c)
+typedef vector<ll> vl;
+#define pb push_back
+#define fo(i, a, b, c) for (ll i = a; i < b; i += c)
+#define fd(a, b, c) for (ll i = a; i >= b; i -= c)
+typedef vector<vl> vll;
+
+vll adj, lca;
+vl level;
+ll maxN;
+
+void dfs(ll node, ll lvl, ll par)
+{
+    level[node] = lvl;
+    lca[node][0] = par;
+
+    for (ll child : adj[node])
+    {
+        if (child != par)
+            dfs(child, lvl + 1, node);
+    }
+}
+
+void init(ll n)
+{
+    dfs(1, 0, -1);
+
+    f(1, maxN + 1, 1)
+    {
+        fo(j, 1, n + 1, 1)
+        {
+            if (lca[j][i - 1] != -1)
+            {
+                ll par = lca[j][i - 1];
+                lca[j][i] = lca[par][i - 1];
+            }
+        }
+    }
+}
+
+ll getLCA(ll a, ll b)
+{
+    if (level[b] < level[a])
+        swap(a, b);
+
+    ll d = level[b] - level[a];
+    while (d > 0)
+    {
+        ll i = log2(d);
+        b = lca[b][i];
+        d -= 1 << i;
+    }
+
+    if (a == b)
+        return a;
+
+    fd(maxN, 0, 1)
+    {
+        if (lca[a][i] != -1 && lca[a][i] != lca[b][i])
+            a = lca[a][i], b = lca[b][i];
+    }
+    return lca[a][0];
+}
+
+ll distance_btw_nodes(ll a, ll b)
+{
+    return level[b] + level[a] - (2 * level[getLCA(a, b)]);
+}
+
+int main()
+{
+    fast;
+
+    ll n, a, b, q;
+
+    cin >> n >> q;
+    adj.resize(n + 1), level.resize(n + 1);
+    maxN = ceil(log2(n));
+    lca.resize(n + 1, vl(maxN + 1, -1));
+
+    f(1, n, 1)
+    {
+        cin >> a >> b;
+        adj[a].pb(b), adj[b].pb(a);
+    }
+
+    init(n);
+
+    while (q--)
+    {
+        cin >> a >> b;
+        cout << distance_btw_nodes(a, b) << endl;
+    }
+    return 0;
+}
