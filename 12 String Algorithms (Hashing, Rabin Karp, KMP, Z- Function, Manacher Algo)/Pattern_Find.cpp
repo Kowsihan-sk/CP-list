@@ -27,7 +27,7 @@ vl calcPrefixArKMP(string pat)
             ar[i] = prefixLen;
         }
         else if (prefixLen > 0)
-            prefixLen = pat[prefixLen];
+            prefixLen = ar[prefixLen];
         else
             i++, ar[i] = 0;
     }
